@@ -61,7 +61,7 @@ public class SecurityConfig {
 						.permitAll())
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/", "/index", "/home", "/login", "/registro", "/css/**", "/img/**", "/js/**",
-								"/static/**", "/recetas", "/recetas/ver", "/recetas/imagen/**", "/pasos/imagen/**", "/ingredientes/**")
+								"/static/**", "/recetas", "/recetas/ver", "/recetas/imagen/**", "/pasos/imagen/**", "/ingredientes/**", "/patrocinadores")
 						.permitAll()
 						.anyRequest().authenticated());
 		return http.build();
