@@ -23,7 +23,7 @@
 					<div class="card bg-dark text-white" style="border-radius: 1rem;">
 						<div class="card-body px-5 text-center">
 							<div class="mb-0 mt-md-1 pb-0">
-								<h2 class="fw-bold mb-2 text-uppercase">Iniciar sesión</h2>
+								<h2 class="fw-bold mb-2 text-uppercase"><u>INICIAR SESION</u></h2>
 								<div class="mb-3">
 									<label for="email" class="form-label">Dirección de correo</label>
 									<input th:field="*{email}" type="email" name="email" class="form-control" placeholder="Correo electronico">
@@ -34,14 +34,9 @@
 								</div>
 								<button type="submit" class="btn btn-primary">Iniciar sesión</button>
 							</div>
-							<div>
-								<p class="mb-0 my-3">¿Aún no tienes cuenta? <a href="/registro" class="text-white-100 fw-bold">Registrarse</a></p>
-								<p class="mb-0 my-3">Ingresar sin iniciar sesion: <a th:href="@{/recetas}" class="text-white-50 fw-bold">Ver recetas</a></p>
-							</div>
-							<div>
-								<button class="btn btn-rpimary">
-									Ingresar sin iniciar sesion
-								</button>
+							<div class="my-4">
+								<p>¿Aún no tienes cuenta? <a href="/registro" class="text-white-100 fw-bold">Registrarse</a></p>
+								<p>Ingresar sin iniciar sesion: <a href="/recetas" class="text-white-50 fw-bold">Ver recetas</a></p>
 							</div>
 						</div>
 					</div>

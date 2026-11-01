@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head th:replace="~{template :: head}"></head>
+
+<body class="bg-secondary">
+	<header th:replace="~{template :: header (${nomUser}, ${rol})}"></header>
+
+	<div style="min-height: 39em;" class="container py-5">
+		<div class="row d-flex justify-content-center align-items-center h-100">
+			<div class="col-12 col-md-8 col-lg-6 col-xl-5">
+				<div th:if="${error != null}">
+					<div class="alert alert-danger" role="alert">
+						<span th:text="${error}"></span>
+					</div>
+				</div>
+				<div th:if="${exito != null}">
+					<div class="alert alert-success" role="alert">
+						<span th:text="${exito}"></span>
+					</div>
+				</div>
+
+					<div class="card bg-dark text-white" style="border-radius: 1rem;">
+						<div class="card-body px-5 text-center">
+							<div class="mb-2 mt-md-3 pb-5">
+								<h2 class="fw-bold mb-3 text-uppercase"><u>USUARIO</u></h2>
+								
+								<!-- Formulario Nombre -->
+								<form th:action="@{/usuarios/cambiar/nombre}" method="post" class="mb-4 border-bottom border-secondary pb-3">
+									<div class="mb-3">
+										<label class="form-label">Nombre</label>
+										<input name="nombre" class="form-control" th:value="${nombre_usuario}" required>
+									</div>
+									<button type="submit" class="btn btn-success w-100">Cambiar Nombre</button>
+								</form>
+
+								<!-- Formulario Correo -->
+								<form th:action="@{/usuarios/cambiar/correo}" method="post" class="mb-4 border-bottom border-secondary pb-3">
+									<div class="mb-3">
+										<label class="form-label">Direccion de correo</label>
+										<input type="email" name="email" class="form-control" th:value="${correo_usuario}" required>
+									</div>
+									<button type="submit" class="btn btn-success w-100">Cambiar Correo</button>
+								</form>
+
+								<!-- Formulario Contraseña -->
+								<form th:action="@{/usuarios/cambiar/password}" method="post" class="mb-4">
+									<h5 class="mb-3">Cambiar Contraseña</h5>
+									<div class="mb-3">
+										<label class="form-label">Contraseña anterior</label>
+										<input type="password" id="oldPass" name="oldPassword" class="form-control" placeholder="Ingrese su contraseña actual" required>
+										<small id="passFeedback" class="text-danger" style="display:none;">Contraseña incorrecta</small>
+									</div>
+									<div class="mb-3">
+										<label class="form-label">Nueva contraseña</label>
+										<input type="password" id="newPass" name="newPassword" class="form-control" placeholder="Nueva contraseña" disabled required>
+									</div>
+									<button type="submit" class="btn btn-warning w-100">Cambiar Contraseña</button>
+								</form>
+
+								<div class="d-flex justify-content-center mt-4">
+									<a th:href="@{/recetas}" class="btn btn-success w-80">Aceptar</a>
+								</div>
+							</div>
+						</div>
+					</div>
+			</div>
+		</div>
+	</div>
+	<footer th:replace="~{template :: footer}"></footer>
+</body>
+
+<script>
+	const oldPassInput = document.getElementById('oldPass');
+	const newPassInput = document.getElementById('newPass');
+	const feedback = document.getElementById('passFeedback');
+
+	oldPassInput.addEventListener('input', async () => {
+		const password = oldPassInput.value;
+		if (password.length > 0) {
+			const formData = new FormData();
+			formData.append('password', password);
+
+			const response = await fetch('/usuarios/validar-password', {
+				method: 'POST',
+				body: formData
+			});
+			const isValid = await response.json();
+
+			newPassInput.disabled = !isValid;
+			feedback.style.display = isValid ? 'none' : 'block';
+			if(isValid) feedback.style.display = 'none'; // Asegurar limpieza
+		}
+	});
+</script>
+
+</html>

@@ -6,7 +6,7 @@
 <body class="bg-secondary">
 	<header th:replace="~{template :: header (${nomUser}, ${rol})}"></header>
 
-	<div class="container py-5 h-100">
+	<div class="container py-5">
 		<div class="row d-flex justify-content-center align-items-center h-100">
 			<div class="col-12 col-md-8 col-lg-6 col-xl-5">
 				<td th:if="${error == '1'}">
@@ -16,9 +16,9 @@
 				</td>
 				<form th:action="@{/registro}" th:object="${usuario}" method="post">
 					<div class="card bg-dark text-white" style="border-radius: 1rem;">
-						<div class="card-body p-5 text-center">
+						<div class="card-body px-5 text-center">
 							<div class="mb-1 mt-md-1 pb-2">
-								<h2 class="fw-bold mb-2 text-uppercase">Registro</h2>
+								<h2 class="fw-bold mb-2 text-uppercase"><u>REGISTRO</u></h2>
 								<div class="mb-3">
 									<label for="nombre" class="form-label">Nombre</label>
 									<input th:field="*{nombre}" class="form-control" id="name" placeholder="Nombre de usuario" required>
@@ -29,9 +29,14 @@
 								</div>
 								<div class="mb-3">
 									<label for="contrasenia" class="form-label">Contraseña</label>
-									<input th:field="*{contrasenia}" type="password" class="form-control" id="contrasenia" placeholder="Contraseña" required>
+									<input th:field="*{contrasenia}" type="password" class="form-control" id="contrasenia" placeholder="Contraseña"
+										required>
 								</div>
 								<button type="submit" class="btn btn-primary">Registrarse</button>
+								<div class="my-4">
+									<p>¿Ya tienes cuenta? <a href="/login" class="text-white-100 fw-bold">Iniciar sesión</a></p>
+									<p>Ingresar sin iniciar sesion: <a href="/recetas" class="text-white-50 fw-bold">Ver recetas</a></p>
+								</div>
 							</div>
 						</div>
 					</div>

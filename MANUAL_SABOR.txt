@@ -1,0 +1,133 @@
+Manual de Usuario y Manual Técnico - Plataforma SABOR
+
+1. Manual de Usuario
+
+1.1 Visión general
+SABOR es una plataforma web de recetario online que permite a usuarios registrados explorar recetas, calificarlas, guardarlas como favoritas, y crear o editar sus propias recetas. Además ofrece un flujo para solicitar imágenes generadas con IA para pasos de preparación.
+
+1.2 Acceso y registro
+1. El usuario ingresa al sitio y puede acceder a la página de inicio de sesión (/login).
+2. Si no tiene cuenta, puede registrarse en /registro proporcionando nombre, correo y contraseña.
+3. El sistema valida que el correo no exista y almacena la contraseña encriptada con BCrypt.
+4. Luego de iniciar sesión con correo y contraseña, el usuario es redirigido a la lista de recetas disponibles.
+
+1.3 Exploración de recetas
+1. Desde la página de recetas (/recetas), el usuario puede ver las recetas más destacadas por calificación, visitas semanales o visitas totales.
+2. El usuario puede buscar recetas por nombre o aplicar filtros por ingredientes.
+3. Al elegir una receta, puede ver el detalle completo: nombre, imagen, ingredientes, pasos, costo estimado, calificación y si ya la marcó como favorita.
+
+1.4 Calificar y guardar recetas
+1. En la vista de una receta el usuario puede calificarla mediante un valor entre 0 y 5.
+2. El sistema guarda la calificación del usuario y recalcula el promedio general de la receta.
+3. El usuario puede marcar o desmarcar la receta como favorita. Las recetas favoritas se almacenan como acciones de usuario y pueden consultarse en /recetas/misFavoritas.
+
+1.5 Mis recetas y edición
+1. En /recetas/misRecetas el usuario ve las recetas que él mismo creó.
+2. Puede editar la receta seleccionada en /recetas/editar, donde modifica nombre, ingredientes, pasos y la imagen asociada.
+3. Al editar, el usuario puede también actualizar imágenes de pasos si se cargan nuevos archivos.
+
+1.6 Crear una receta
+1. El usuario accede a /receta/agregar para crear una nueva receta.
+2. Debe completar los datos básicos, seleccionar ingredientes con cantidad y costos, y definir los pasos de preparación.
+3. Puede subir una imagen principal para la receta.
+4. Para cada paso puede indicar si desea generar una petición de imagen con IA ingresando una descripción de la imagen. Estas peticiones se envían en estado pendiente para revisión por un moderador.
+
+1.7 Peticiones de imagen con IA
+1. Cuando el usuario marca un paso para generar imagen con IA, la plataforma crea una petición con estado PENDIENTE.
+2. Un moderador puede revisar el estado de las peticiones y aprobar o denegar la generación de la imagen.
+
+1.8 Gestión de cuenta
+1. El usuario puede editar su perfil en /usuarios/editar y cambiar sus datos personales.
+2. En /usuarios/cambiar puede cambiar nombre, correo o contraseña.
+3. Para cambiar contraseña se solicita la contraseña actual y la nueva contraseña; el sistema valida la contraseña anterior antes de aceptar el cambio.
+
+1.9 Flujo natural de usuario
+1. El usuario abre la plataforma y decide si desea ingresar o registrarse.
+2. Tras iniciar sesión, navega las recetas disponibles y usa la búsqueda o filtros para encontrar una receta interesante.
+3. Visualiza detalles de una receta, la califica, la guarda como favorita o la comparte con el sistema para futuras consultas.
+4. Si desea contribuir, crea o edita recetas propias con ingredientes, pasos e imágenes.
+5. Para pasos sin imagen, puede solicitar la creación de imágenes con IA y el moderador revisa la petición.
+
+2. Manual Técnico
+
+2.1 Arquitectura general
+SABOR es una aplicación Java basada en Spring Boot con arquitectura MVC y capa de persistencia JPA. El proyecto está organizado en paquetes principales:
+ - com.flerchante.recetario.controller: controladores web y rutas HTTP.
+ - com.flerchante.recetario.model.entity: entidades JPA que representan tablas de la base de datos.
+ - com.flerchante.recetario.model.dto: objetos de transferencia para formularios compuestos.
+ - com.flerchante.recetario.repository: repositorios JPA que exponen operaciones de acceso a datos.
+ - com.flerchante.recetario.service: servicios de negocio que encapsulan la lógica de aplicación.
+ - com.flerchante.recetario.security: configuración de seguridad Spring Security.
+
+2.2 Entidades principales
+Usuario: representa al usuario de la plataforma. Tiene nombre, correo, contraseña encriptada y relación con un Rol. Un usuario puede crear recetas y ejecutar acciones (favorito o calificación).
+Rol: define el perfil del usuario (por ejemplo USER o moderador), su nombre y descripción. Se usa en seguridad para asignar roles a la sesión.
+Receta: representa una receta culinaria con nombre, imagen, visitas, calificación promedio y referencias a su creador, ingredientes, pasos y acciones de usuario.
+Ingrediente: representa un ingrediente disponible para recetas, con nombre, costo unitario, magnitud y posible imagen y patrocinador.
+Detalle: asocia una receta con un ingrediente, indicando cantidad y costo parcial. Se utiliza para calcular el costo total de la receta.
+Paso: representa un paso de preparación dentro de una receta. Puede incluir notas, imagen y una petición de IA para generar una imagen de ese paso.
+PeticionIA: representa una solicitud de generación de imagen con IA. Tiene un estatus (PEN/ENT/DEN) y descripción. Se vincula a un Paso.
+AccionUsuario: almacena interacciones de usuarios con recetas, como FAVORITO (FAV) y CALIFICACIÓN (CAL). Permite saber qué recetas marcó o calificó un usuario y conservar el detalle de la calificación.
+
+2.3 Repositorios
+Los repositorios extienden JpaRepository y proporcionan CRUD básico junto con consultas personalizadas:
+ - RecetaRepository: consultas para ordenar recetas por visitas semanales o totales, búsqueda por nombre y actualizaciones de visitas, nombre y calificación.
+ - PeticionesRepository: CRUD de peticiones de IA, actualización de estatus y creación de peticiones con SQL nativo.
+ - UsuarioRepository: búsqueda de usuarios por email y CRUD de usuarios.
+ - RolRepository: obtención de roles por id.
+ - IngredienteRepository, DetalleRepository, PasoRepository, AccionUsuarioRepository: CRUD para ingredientes, detalles de receta, pasos y acciones de usuario. También presentan consultas avanzadas para filtrar por ingredientes y asignar peticiones IA.
+
+2.4 Servicios
+Cada servicio implementa una interfaz y se encarga de la lógica de negocio:
+ - UsuarioServiceImpl: obtiene usuarios por id o email, guarda/actualiza usuarios, y consulta el usuario de la sesión actual usando Spring Security.
+ - RecetaServiceImpl: guarda recetas inicializando valores de visitas y calificaciones, obtiene listas, filtra por nombre, controla top semanal/total, y actualiza visitas o calificaciones en transacciones.
+ - PeticionesServiceImpl: gestiona peticiones de IA, las ordena, actualiza estatus y genera nuevas peticiones.
+ - PasoServiceImpl: actualiza pasos, guarda pasos asociados a una receta y asigna peticiones de IA a pasos.
+ - DetalleServiceImpl: calcula costos de detalles, guarda detalles de recetas y actualiza cantidades e ingredientes.
+ - IngredienteServiceImpl: lista ingredientes ordenados y obtiene ingredientes individuales.
+ - RolServiceImpl: obtiene roles por id.
+ - UserUtils: ayuda a inyectar información del usuario autenticado en el modelo para las vistas.
+
+2.5 Controladores
+LoginController: muestra la vista de login y maneja errores o mensajes de logout.
+RegistroController: muestra el formulario de registro y crea nuevos usuarios con rol USER y contraseña cifrada.
+RecetaController: la pieza central para listar recetas, ver detalles, filtrar por ingredientes, calificar, marcar favoritas, crear, editar y eliminar recetas. También maneja la vista de creación y edición de recetas y la lógica de peticiones de imagen IA en los pasos.
+UsuarioController: permite al usuario ver y editar su perfil, cambiar nombre, correo y contraseña, además de validar la contraseña actual por AJAX.
+ModeradorController: administra la vista de peticiones de imagen IA, filtra peticiones por estado, muestra detalles y permite aprobar o denegar peticiones. Solo usuarios con rol distinto a USER pueden acceder a estas operaciones.
+ImagenController: expone endpoints para devolver imágenes de recetas, pasos e ingredientes como bytes HTTP, y convierte archivos MultipartFile a Blob para persistencia.
+
+2.6 Seguridad
+Spring Security se configura con un SecurityFilterChain personalizado en SecurityConfig. Los puntos clave son:
+ - CSRF y CORS deshabilitados explícitamente.
+ - Login personalizado en /login con parámetros email y contrasenia.
+ - Redirección exitosa a /recetas y manejo de error en /login?error.
+ - Logout en /logout con redireccionamiento a /login?logout.
+ - Permiso público para rutas de inicio, login, registro, recursos estáticos y algunas páginas de recetas e imágenes.
+ - El resto de rutas requiere autenticación.
+ - UserDetailsService carga el usuario desde la base de datos usando UsuarioService y asigna roles desde el campo Rol.nombre.
+ - PasswordEncoder BCrypt para encriptar y verificar contraseñas.
+
+2.7 Configuración de conexión y base de datos
+La aplicación se conecta a una base de datos Oracle configurada en src/main/resources/application.properties:
+ - spring.datasource.url=jdbc:oracle:thin:@localhost:1521/freepdb1
+ - spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+ - spring.datasource.username=RECETARIO
+ - spring.datasource.password=FIS
+ - spring.jpa.database-platform=org.hibernate.community.dialect.Oracle12cDialect
+ - spring.jpa.hibernate.ddl-auto=none (la base de datos no se recrea automáticamente)
+ - Configuración de multipart para subir archivos: límite de 100MB por archivo y 50MB por petición.
+
+2.8 Generación de plantillas HTML
+Las vistas HTML se generan con plantillas Thymeleaf ubicadas en src/main/resources/templates. Los controladores retornan nombres de vistas que apuntan a archivos como:
+ - login.html, registro.html, index.html, template.html
+ - vistas/recetas/descubrir.html, ver.html, editar.html, agregar.html
+ - vistas/usuarios/editar.html, cambiar.html, usuarios.html
+ - vistas/moderador/peticiones.html, verPeticion.html
+ - vistas/ingredientes/lista.html, ver.html
+Los modelos se llenan con atributos como recetas, ingredientes, usuarioSesion, dto, pasoDTOs, y estados de error/éxito. Thymeleaf renderiza el contenido dinámico y muestra datos del usuario autenticado. Los recursos estáticos (CSS, JS, imágenes) se sirven desde src/main/resources/static.
+
+2.9 Temas relevantes adicionales
+ - El sistema guarda imágenes en columnas Blob de la base de datos y las entrega a los clientes vía endpoints específicos. No usa almacenamiento en disco para imágenes de recetas ni de pasos.
+ - Las calificaciones y favoritos se gestionan mediante la entidad AccionUsuario, separando la interacción del usuario de la entidad Receta.
+ - La generación de peticiones IA es un flujo de negocio que conecta los pasos de receta con aprobaciones de moderador. El estado de la petición se maneja con códigos cortos como PEN, ENT y DEN.
+ - Los controladores mezclan lógica de vista y etapas de negocio; la capa de servicio concentra operaciones de persistencia y cálculos como aumentar visitas o actualizar costos.

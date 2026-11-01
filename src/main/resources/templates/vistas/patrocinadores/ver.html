@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head th:replace="~{template :: head}"></head>
+
+<body class="bg-body-secondary">
+	<header th:replace="~{template :: header (${nomUser}, ${rol})}"></header>
+	<div style="min-height: 39em;">
+		<h1 class="text-center">PATROCINADOR</h1>
+		<div class="m-2 p-4 border border-dark rounded border-3 bg-light">
+			<div class="container mb-3 rounded border border-success border-2" style="background-color:#e8f3ec;">
+				<div class="row align-items-center">
+					<div class="col-lg-4 col-md-8">
+						<div class="row py-2">
+							<h2 class="text-body" th:text="${nombreIngrediente}"></h2>
+						</div>
+						<div class="row border-top border-dark border-1 py-2">
+							<h4 class="text-body-secondary" th:text="'Ingrediente patrocinado por: ' + ${nombrePatrocinador}"></h4>
+						</div>
+						<div class="row border-top border-dark border-1 py-2">
+							<h4 class="text-body-tertiary">
+								Sitio oficial:
+								<p><a class="link-opacity-100-hover" th:href="${link}" th:text="${link}" target="_blank"></a></p>
+							</h4>
+						</div>
+						<div class="row border-top border-dark border-1 py-2">
+							<h5 class="text-body-tertiary" th:text="'Utilizado en ' + ${utilizado} + ' recetas'"></h5>
+						</div>
+						<div class="row border-top border-dark border-1 py-2">
+							<h5 class="text-body-tertiary" th:text="'Costo unitario: $' + ${costo}"></h5>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-12 text-center">
+						<img th:src="@{/ingredientes/imagen/{id}(id=${idIngrediente})}" class="card-img-top border border-2 border-dark rounded p-1"
+							alt="Imagen de Ingrediente no encontrada"
+							style="max-width: 300px; max-height: 300px; min-width: 250px; min-height: 250px;">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer th:replace="~{template :: footer}"></footer>
+</body>
+
+</html>
