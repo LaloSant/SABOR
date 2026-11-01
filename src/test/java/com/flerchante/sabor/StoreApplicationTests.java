@@ -49,7 +49,7 @@ class RecetarioApplicationTests {
 	void testListarRecetas() throws Exception {
 		mockMvc.perform(get("/recetas"))
 				.andExpect(status().isOk())
-				.andExpect(view().name("/vistas/recetas/descubrir"))
+				.andExpect(view().name("vistas/recetas/descubrir"))
 				.andExpect(model().attributeExists("recetas"));
 	}
 
@@ -57,7 +57,7 @@ class RecetarioApplicationTests {
 	void testagregarPage() throws Exception {
 		mockMvc.perform(get("/receta/agregar"))
 				.andExpect(status().isOk())
-				.andExpect(view().name("/vistas/recetas/agregar"));
+				.andExpect(view().name("vistas/recetas/agregar"));
 	}
 
 }

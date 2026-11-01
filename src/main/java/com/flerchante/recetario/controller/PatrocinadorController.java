@@ -27,7 +27,7 @@ public class PatrocinadorController {
 	@Autowired
 	private UserUtils userUtils;
 
-	private static final String RUTA_VISTA = "/vistas/patrocinadores/";
+	private static final String RUTA_VISTA = "vistas/patrocinadores/";
 
 	@GetMapping("/patrocinadores")
 	public String getListaIngredientes(Model modelo) {

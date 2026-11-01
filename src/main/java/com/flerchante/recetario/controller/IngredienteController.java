@@ -21,7 +21,7 @@ public class IngredienteController {
 	@Autowired
 	private IngredienteServiceImpl ingredienteRepositorio;
 
-	private static final String RUTA_VISTA = "/vistas/ingredientes/";
+	private static final String RUTA_VISTA = "vistas/ingredientes/";
 
 	@GetMapping("/ingredientes")
 	public String getListaIngredientes(Model modelo) {

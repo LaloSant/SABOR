@@ -28,7 +28,7 @@ public class UsuarioController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	private static final String RUTA_VISTA = "/vistas/usuarios/";
+	private static final String RUTA_VISTA = "vistas/usuarios/";
 
 	@GetMapping("/usuarios")
 	public String listarUsuarios(Model modelo) {

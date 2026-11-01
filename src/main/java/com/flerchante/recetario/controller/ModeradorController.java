@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class ModeradorController {
-	private static final String RUTA_MODERADOR = "/vistas/moderador/";
+	private static final String RUTA_MODERADOR = "vistas/moderador/";
 
 	@Autowired
 	private UsuarioServiceImpl usuarioRepositorio;

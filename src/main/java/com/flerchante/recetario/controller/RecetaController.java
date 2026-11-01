@@ -36,7 +36,7 @@ import com.flerchante.recetario.service.usuario.UsuarioServiceImpl;
 @Controller
 public class RecetaController {
 
-	private static final String RUTA_VISTA = "/vistas/recetas/";
+	private static final String RUTA_VISTA = "vistas/recetas/";
 
 	@Autowired
 	private RecetaServiceImpl recetaRepositorio;

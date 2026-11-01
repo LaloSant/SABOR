@@ -18,6 +18,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,13 +46,17 @@ public class Receta {
 
 	@Column(name = "VISITAS_TOTALES")
 	private Long visitasTotales;
+
 	@Column(name = "VISITAS_SEMANALES")
 	private Long visitasSemanales;
 
 	@Column(name = "CALIFICACIONES_TOTALES")
 	private Long calificacionesTotales;
 
-	@Column(name = "CALIFICACION", columnDefinition = "NUMBER CHECK (CALIFICACION >= 0 AND CALIFICACION <= 5)")
+	@DecimalMin("0.0")
+	@DecimalMax("5.0")
+	// @Column(name = "CALIFICACION", columnDefinition = "NUMBER CHECK (CALIFICACION >= 0 AND CALIFICACION <= 5)")
+	@Column(name = "CALIFICACION")
 	private Double calificacion;
 
 	@ManyToOne
