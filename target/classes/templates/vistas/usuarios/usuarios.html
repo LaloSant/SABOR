@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head th:replace="~{template :: head}"></head>
+
+<body>
+    <header th:replace="~{template :: header}"></header>
+
+    <div class="container">
+        <div class="row">
+            <h1>Usuarios registrados</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <a th:href="@{/usuarios/nuevo}" class="btn btn-lg btn-success">Añadir usuario</a>
+            </div>
+        </div>
+        <br>
+        <table class="table table-stripped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID_USUARIO</th>
+                    <th>NOMBRE</th>
+                    <th>APELLIDO PATERNO</th>
+                    <th>CORREO</th>
+                    <th>CONTRASENIA</th>
+                    <th>OPCIONES</TH>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="usuario : ${usuarios}">
+                    <td th:text="${usuario.idUsuario}">ID_USUARIO</td>
+                    <td th:text="${usuario.nombre}">NOMBRE</td>
+                    <td th:text="${usuario.apPat}">APELLIDO PATERNO</td>
+                    <td th:text="${usuario.correo}">CORREO</td>
+                    <td th:text="${usuario.contrasenia}">CONTRASENIA</td>
+                    <td>
+                        <a th:href="@{/usuarios/editar/{idUsuario}(idUsuario=${usuario.idUsuario})}" class="btn btn-info">Editar</a>
+                        <a th:href="@{/usuarios/{idUsuario}(idUsuario=${usuario.idUsuario})}" class="btn btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

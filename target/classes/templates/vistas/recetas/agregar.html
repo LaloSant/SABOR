@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="https://www.thymeleaf.org">
+
+<head th:replace="~{template :: head}"></head>
+
+<body class="bg-body-secondary">
+	<header th:replace="~{template :: header (${nomUser}, ${rol})}"></header>
+	<div class="container p-2">
+		<div class="row">
+			<div class="container justify-content-center card m-3">
+				<h1 class="text-center my-2"><u>AGREGAR RECETA</u></h1>
+				<div class="card-body">
+					<form th:action="@{/receta/agregar}" th:object="${dto}" method="post" enctype="multipart/form-data">
+						<div class="mb-2 border p-2">
+							<!-- <div class="input-group">
+									<span class="input-group-text"><i class="bi bi-hash"></i></span>
+									<span class="input-group-text" th:text="'ID RECETA'"></span>
+									<input class="form-control bg-light" type="text" readonly placeholder="Generado automaticamente">
+								</div> -->
+							<div class="input-group">
+								<span class="input-group-text"><i class="bi bi-file-text"></i></span>
+								<span class="input-group-text">NOMBRE</span>
+								<input class="form-control" th:field="*{receta.nombre}" placeholder="Ingrese nombre de receta " type="text" required
+									minlength="3" maxlength="255">
+							</div>
+							<div class="input-group my-3">
+								<span class="input-group-text"><i class="bi bi-image"></i></span>
+								<span class="input-group-text">IMAGEN DE RECETA</span>
+								<input type="file" th:field="*{imagen}" class="form-control" accept=".jpg,image/jpeg" />
+							</div>
+							<!-- <div class="input-group mt-2">
+									<span class="input-group-text"><i class="bi bi-person-circle"></i></span>
+									<span class="input-group-text" th:text="'USUARIO'"></span>
+									<span class="input-group-text" th:text="${nomUser}"></span>
+								</div> -->
+						</div>
+						<div class="my-2 border p-2">
+							<div class="d-flex justify-content-center mt-2">
+								<h4 class="text-center">INGREDIENTES:</h4>
+							</div>
+							<div id="detalles-container">
+							</div>
+							<div class="d-flex justify-content-center my-2">
+								<button type="button" class="btn btn-info" onclick="agregarDetalle()">Agregar Ingrediente</button>
+							</div>
+						</div>
+						<div class="mb-2 mt-2 border p-2">
+							<div class="">
+								<h4 class="text-center">PASOS:</h4>
+								<h6 class="text-center text-secondary mb-4">PARA AGREGAR IMAGENES A LOS PASOS, EDITE LA RECETA DESPUES DE AGREGARLA
+								</h6>
+							</div>
+							<div id="pasos-container">
+							</div>
+							<div class="d-flex justify-content-center my-2">
+								<button type="button" class="btn btn-info" onclick="agregarPaso()">Agregar Paso</button>
+							</div>
+						</div>
+						<div class="box-footer d-flex justify-content-center my-2">
+							<button class="btn btn-success btn-lg">Guardar Receta</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer th:replace="~{template :: footer}"></footer>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		const ingredientes = /*[[${ingredientes}]]*/[];
+		/*]]>*/
+
+		let pasoIndex = 0;
+		let detalleIndex = 0;
+
+		function agregarPaso() {
+			const container = document.getElementById('pasos-container');
+
+			const pasoDiv = document.createElement('div');
+			pasoDiv.className = 'mb-3 mt-1 paso-item';
+
+			const inputGroup = document.createElement('div');
+			inputGroup.className = 'input-group';
+
+			inputGroup.innerHTML = `
+				<div class="input-group mb-2">
+					<span class="input-group-text"><i class="bi bi-chevron-right"></i></span>
+					<span class="input-group-text paso-number">${pasoIndex + 1}:</span>
+					<span class="input-group-text remove-paso" role="button" tabindex="0" title="Quitar paso" style="cursor:pointer"><i class="bi bi-x"></i></span>
+					<input type="text" name="pasos[${pasoIndex}].notas" class="form-control" placeholder="Descripción del paso (mayor a 10 caractéres)"
+						required minlength="10" maxlength="200" />
+				</div>
+				<div class="input-group bg-light">
+					<span class="input-group-text ">
+						<input class="form-check-input mt-0" type="checkbox" name="pasos[${pasoIndex}].generarPeticion" value="true">
+					</span>
+					
+					<h6 class="text-center text-secondary m-2">Generar petición IA para este paso</h6>
+				</div>
+			`;
+			/* <span class="input-group-text">Generar petición IA para imagen de este paso</span> */
+			pasoDiv.appendChild(inputGroup);
+			container.appendChild(pasoDiv);
+
+			// attach remove handler and reindex after removal
+			const removeBtn = pasoDiv.querySelector('.remove-paso');
+			if (removeBtn) {
+				removeBtn.addEventListener('click', () => {
+					pasoDiv.remove();
+					reindexPasos();
+				});
+				removeBtn.addEventListener('keydown', (e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						pasoDiv.remove();
+						reindexPasos();
+					}
+				});
+			}
+
+			pasoIndex++;
+		}
+
+		function reindexPasos() {
+			const container = document.getElementById('pasos-container');
+			const pasos = container.querySelectorAll('.paso-item');
+			pasos.forEach((div, idx) => {
+				const numero = div.querySelector('.paso-number');
+				if (numero) numero.textContent = `${idx + 1}:`;
+				const notas = div.querySelector('input[type="text"][name^="pasos"]');
+				if (notas) notas.name = `pasos[${idx}].notas`;
+				const checkbox = div.querySelector('input[type="checkbox"][name^="pasos"]');
+				if (checkbox) checkbox.name = `pasos[${idx}].generarPeticion`;
+			});
+			pasoIndex = pasos.length;
+		}
+
+		function agregarDetalle() {
+			const container = document.getElementById('detalles-container');
+
+			const detalleDiv = document.createElement('div');
+			detalleDiv.className = 'mb-3 mt-1 ms-0 detalle-item';
+
+			const inputGroup = document.createElement('div');
+			inputGroup.className = 'input-group';
+
+			let optionsHtml = '<option value="">Seleccionar ingrediente</option>';
+			ingredientes.forEach(ingrediente => {
+				optionsHtml += `<option value="${ingrediente.idIngrediente}">${ingrediente.nombre} (${ingrediente.magnitud})</option>`;
+			});
+
+			inputGroup.innerHTML = `
+				<span class="input-group-text"><i class="bi bi-chevron-right"></i></span>
+				<span class="input-group-text remove-detalle" role="button" tabindex="0" title="Quitar ingrediente" style="cursor:pointer"><i class="bi bi-x"></i></span>
+				<input type="number" step="0.1" min="0" max="1000" name="detalles[${detalleIndex}].cantidad" class="form-control" placeholder="Cantidad" required/>
+				<select name="detalles[${detalleIndex}].ingrediente.idIngrediente" class="form-select" required>
+					${optionsHtml}
+				</select>
+			`;
+
+			detalleDiv.appendChild(inputGroup);
+			container.appendChild(detalleDiv);
+
+			// attach remove handler and reindex after removal
+			const removeBtn = detalleDiv.querySelector('.remove-detalle');
+			if (removeBtn) {
+				removeBtn.addEventListener('click', () => {
+					detalleDiv.remove();
+					reindexDetalles();
+				});
+				// removeBtn.addEventListener('keydown', (e) => {
+				// 	if (e.key === 'Enter' || e.key === ' ') {
+				// 		e.preventDefault();
+				// 		detalleDiv.remove();
+				// 		reindexDetalles();
+				// 	}
+				// });
+			}
+
+			detalleIndex++;
+		}
+
+		function reindexDetalles() {
+			const container = document.getElementById('detalles-container');
+			const detalles = container.querySelectorAll('.detalle-item');
+			detalles.forEach((div, idx) => {
+				const cantidad = div.querySelector('input[name^="detalles"]');
+				if (cantidad) cantidad.name = `detalles[${idx}].cantidad`;
+				const select = div.querySelector('select[name^="detalles"]');
+				if (select) select.name = `detalles[${idx}].ingrediente.idIngrediente`;
+			});
+			detalleIndex = detalles.length;
+		}
+
+	</script>
+
+</body>
+
+</html>

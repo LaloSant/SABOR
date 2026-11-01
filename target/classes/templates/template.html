@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="es">
+
+<head th:fragment="head">
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>S.A.B.O.R.</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+	<link rel="icon" type="image/jpeg" th:href="@{/img/SABOR.jpg}">
+</head>
+
+<!-- <body> -->
+<header th:fragment="header (nomUser, rol)">
+	<nav class="navbar navbar-dark bg-dark navbar-expand-md sticky-top">
+		<div class="container-fluid">
+			<a class="navbar-brand py-2">
+				<img th:src="@{/img/SABOR.jpg}" alt="LOGO" width="50" height="50"
+					class="d-inline-block align-text-middle">
+			</a>
+			<a th:href="@{/recetas}" class="navbar-brand fs-2">SABOR</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSuperior"
+				aria-controls="navbarSuperior" aria-expanded="false" aria-label="Cambiar vista">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse fs-5" id="navbarSuperior">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link active border-bottom border-success" aria-current="page"
+							th:href="@{/recetas}"><i class="bi bi-house"></i> Pagina principal</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a th:text="${nomUser != null ? 'Usuario: ' + nomUser : 'Iniciar sesion'}"
+							class="nav-link dropdown-toggle border-bottom text-wrap" role="button"
+							data-bs-toggle="dropdown" aria-expanded="false"></a>
+						<ul class="dropdown-menu fs-5 bg-body-secondary">
+							<li><a class="dropdown-item" th:href="@{/login}">Ingresar</a></li>
+							<li><a class="dropdown-item" th:href="@{/registro}">Registrarse</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li th:if="${nomUser != null}"><a class="dropdown-item" th:href="@{/usuarios/editar}">Mi
+									usuario</a></li>
+							<li th:if="${nomUser != null}"><a class="dropdown-item" th:href="@{/recetas/misRecetas}">Mis
+									recetas</a></li>
+							<li th:if="${nomUser != null}"><a class="dropdown-item"
+									th:href="@{/recetas/misFavoritas}">Mis favoritas</a></li>
+							<li th:if="${nomUser != null}"> <a class="dropdown-item"
+									th:href="@{/receta/agregar}">Agregar receta</a></li>
+							<li th:if="${nomUser != null}">
+								<hr class="dropdown-divider">
+							</li>
+							<li th:if="${nomUser != null}"><a class="dropdown-item" th:href="@{/logout}">Cerrar
+									sesion</a></li>
+						</ul>
+					</li>
+					<li th:if="${rol != null and (rol == 'Moderador' or rol == 'Admin')}" class="nav-item dropdown">
+						<a th:text="${'Moderador'}"
+							class="nav-link dropdown-toggle border-bottom border-primary text-wrap" role="button"
+							data-bs-toggle="dropdown" aria-expanded="false"></a>
+						<ul class="dropdown-menu fs-5 bg-body-secondary">
+							<li><a class="dropdown-item" th:href="@{/moderador/peticiones}">Consultar Peticiones IA</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<form class="d-flex" th:action="@{/recetas}" method="get" role="search">
+					<input class="form-control me-2 fs-5" type="search" name="nombreReceta"
+						placeholder="Receta (nombre)" aria-label="Buscar" />
+					<button class="btn btn-success fs-5" type="submit">Buscar</button>
+				</form>
+			</div>
+		</div>
+	</nav>
+</header>
+<!-- </body> -->
+
+<div th:fragment="receta-card (receta, usuarioSesion)" class="card my-1 mx-auto border-4 border-dark-subtle"
+	style="width: 300px;">
+	<a th:href="@{/recetas/ver(idReceta=${receta.idReceta})}">
+		<img th:src="@{/recetas/imagen/{id}(id=${receta.idReceta})}" class="card-img-top"
+			alt="Imagen de receta no encontrada"
+			style="max-width: 300px; max-height: 250px; min-width: 250px; min-height: 200px;">
+	</a>
+	<div class="card-body">
+		<h4 class="card-title" th:text="${receta.nombre}"></h4>
+	</div>
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item">
+			<h4>Calificacion</h4>
+			<span th:each="i : ${#numbers.sequence(1, 5)}">
+				<span th:if="${i <= receta.calificacion}" style="color: orange;">★</span>
+				<span th:unless="${i <= receta.calificacion}" style="color: orange;">☆</span>
+			</span>
+		</li>
+		<li class="list-group-item" th:text="'Costo aproximado: $' +  ${receta.calcularCosto()} "></li>
+		<li class="list-group-item" th:text="${receta.visitasSemanales} + ' visitas semanales'"></li>
+		<li class="list-group-item" th:text="${receta.visitasTotales} + ' visitas totales'"></li>
+		<li class="list-group-item" th:text="'Subido por: ' + ${receta.usuario.nombre}"></li>
+	</ul>
+	<div class="card-body m-0">
+		<div class="container text-center p-0">
+			<div class="row justify-content-center">
+				<div class="col px-1">
+					<a th:href="@{/recetas/ver(idReceta=${receta.idReceta})}" class="btn btn-success w-100"><i
+							class="bi bi-eye-fill"></i> Ver
+						Receta</a>
+				</div>
+				<div th:if="${usuarioSesion} == ${receta.usuario}" class="col px-1">
+					<a th:href="@{/recetas/editar(idReceta=${receta.idReceta})}" class="btn btn-warning w-100"><i
+							class="bi bi-pencil-fill"></i>
+						Editar</a>
+				</div>
+				<div th:if="${usuarioSesion} == ${receta.usuario}" class="col px-1">
+					<a th:href="@{/recetas/eliminar(idReceta=${receta.idReceta}, nom=${nomUser})}"
+						class="btn btn-danger w-100"><i class="bi bi-x-circle-fill"></i>Eliminar</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div th:fragment="campo-input (id, claseIcono, value, textoCampo, textoHint)" class="mb-1 mt-3">
+	<div class="input-group">
+		<span class="input-group-text" th:id="${id}">
+			<i th:class="${claseIcono}"></i>
+		</span>
+		<span class="input-group-text" th:id="${id}" th:text="${textoCampo}"></span>
+		<input th:value="${value}" type="text" class="form-control" th:id="${id}">
+	</div>
+</div>
+
+<div th:fragment="campo-input-read-only (id, claseIcono, value, textoCampo, textoHint)" class="mb-1 mt-3">
+	<div class="input-group">
+		<span class="input-group-text" id="idReceta">
+			<i th:class="${claseIcono}"></i>
+		</span>
+		<span class="input-group-text" th:id="${id}" th:text="${textoCampo}"></span>
+		<input th:value="${value}" type="text" class="form-control bg-light" th:id="${id}" readonly>
+		<span class="input-group-text" th:text="${textoHint}"></span>
+	</div>
+</div>
+
+<footer th:fragment="footer" class="footer-dark bg-dark text-white p-3">
+
+	<section class="">
+		<div class="container text-center mt-5">
+			<div class="row mt-3">
+				<div class="col-md-1 col-lg-2 col-xl-3 mx-auto mb-4">
+					<h6 class="text-uppercase fw-bold mb-4 fs-4">PROYECTO</h6>
+					<a href="https://github.com/LaloSant/SABOR" target="_blank" class="text-reset">S.A.B.O.R.</a>
+					<p>Sistema de Almacenamiento y Búsqueda Optimizada de Recetas</p>
+				</div>
+				<div class="col-md-2 col-lg-3 col-xl-3 mx-auto mb-4 mb-md-0">
+					<h6 class="text-uppercase fw-bold mb-4 fs-4">INSTITUCION</h6>
+					<p>
+						<i class="bi bi-building"></i>
+						<a href="https://www.tolucatecnm.mx/" target="_blank" class="text-reset">Instituto Tecnológico
+							de Toluca</a>
+					</p>
+					<p>
+						<i class="bi bi-backpack3"></i>
+						<a href="#" class="text-reset">Fundamentos de Ingeniería de Software</a>
+					</p>
+					<p>
+						<i class="bi bi-backpack3"></i>
+						<a href="#" class="text-reset">Ingeniería de Software</a>
+					</p>
+				</div>
+				<div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+					<h6 class="text-uppercase fw-bold mb-4 fs-4">DOCENTE</h6>
+					<p>
+						<i class="bi bi-person-fill"></i>
+						MTE MORENO RAMIREZ ROSA ELVIRA
+					</p>
+				</div>
+				<div class="col-md-2 col-lg-4 col-xl-4 mx-auto mb-4">
+					<h6 class="text-uppercase fw-bold mb-4 fs-4">EQUIPO</h6>
+					<p>
+						<i class="bi bi-person"></i>
+						<a href="https://github.com/LaloSant" class="link-light" target="_blank">BAUTISTA SANTIESTEBAN
+							EDUARDO JAIR</a>
+					</p>
+					<p>
+						<i class="bi bi-person"></i>
+						<a href="https://github.com/DanFar562" class="link-light" target="_blank">FARFÁN GOMEZ ALAN
+							DANIEL</a>
+					</p>
+					<p>
+						<i class="bi bi-person"></i>
+						<a href="https://github.com/yael8895" class="link-light" target="_blank">SAMPAYO MARIN YAEL</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div class="text-center bg-dark">2025 && 2026</div>
+</footer>
+
+</html>
