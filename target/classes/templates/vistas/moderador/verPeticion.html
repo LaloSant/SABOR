@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head th:replace="~{template :: head}"></head>
+
+<body class="bg-secondary">
+	<header th:replace="~{template :: header (${nomUser}, ${rol})}"></header>
+	<div class="m-3 p-2">
+		<div class="bg-dark m-3 py-3">
+			<h2 th:text="'ID PETICION: ' + ${dto.peticion.idPeticionIA}" class="text-center text-white"></h2>
+			<h4 th:text="'DESCRIPCION: ' + ${dto.peticion.descripcion}" class="text-center text-white"></h4>
+			<h4 th:text="'ESTATUS: ' + ${dto.peticion.estatus == 'PEN' ? 'PENDIENTE' : dto.peticion.estatus == 'ENT' ? 'ENTREGADO' : 'DENEGADO'}"
+				class="text-center text-white"></h4>
+			<h5 th:text="'INDICE PASO: ' + ${dto.peticion.paso.indicePaso}" class="text-center text-secondary"></h5>A
+			<a th:href="@{/recetas/ver(idReceta=${dto.peticion.paso.receta.idReceta})}" class="btn btn-info text-center">
+				<i class="bi bi-box-arrow-right"></i> VER RECETA
+			</a>
+		</div>
+		<div class="cointainer m-3 p-2">
+			<div class="row bg-dark">
+				<div class="col col-md-5 m-2">
+
+					<h4 class="text-center text-white">AÑADIR IMAGEN</h4>
+					<h6 id="prompt-text" class="text-white"
+						th:text="'PROMPT SUGERIDO: Genera una imagen para un paso de una receta de: ' + ${dto.peticion.paso.receta.nombre} + '. Para el paso con descripcion: ' + ${dto.peticion.descripcion}">
+					</h6>
+					<div class="d-flex justify-content-center my-2">
+						<button class="btn btn-success" onclick="copyPrompt()">
+							<i class="bi bi-clipboard"></i> Copiar Prompt
+						</button>
+					</div>
+					<form th:action="@{/peticion/modificar}" th:object="${dto}" method="post" enctype="multipart/form-data">
+						<div class="input-group my-3">
+							<span class="input-group-text"><i class="bi bi-image"></i></span>
+							<span class="input-group-text">Imagen</span>
+							<input type="file" th:field="*{mpf}" class="form-control" accept=".jpg,image/jpeg" onchange="previewImage(event)" />
+							<input hidden th:field="*{peticion.idPeticionIA}" th:value="${dto.peticion.idPeticionIA}" readonly>
+						</div>
+						<div class="box-footer d-flex justify-content-center">
+							<button id="submit-button" class="btn btn-primary" disabled>Añadir imagen y entregar peticion</button>
+						</div>
+					</form>
+				</div>
+				<div class="col col-md-5 m-2">
+					<h4 id="image-title" th:text="${dto.peticion.paso.imagen == null ? 'SIN IMAGEN SELECCIONADA' : 'IMAGEN SELECCIONADA'}"
+						class="text-center text-white">
+					</h4>
+					<div class="text-center my-3">
+						<img id="current-image" th:if="${dto.peticion.paso.imagen != null}"
+							th:src="@{/pasos/imagen/{id}(id=${dto.peticion.paso.idPaso})}" class="card-img-top " alt="Sin imagen de paso"
+							style="width: 200px; height: 200px;" />
+						<img id="image-preview" src="#" alt="Previsualización" class="card-img-top"
+							style="max-width: 200px; max-height: 200px; display: none;" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer th:replace="~{template :: footer}"></footer>
+	<script>
+		function previewImage(event) {
+			const input = event.target;
+			const submitButton = document.getElementById('submit-button');
+			const imagePreview = document.getElementById('image-preview');
+			const currentImage = document.getElementById('current-image');
+			const imageTitle = document.getElementById('image-title');
+
+			if (input.files && input.files[0]) {
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					imagePreview.src = e.target.result;
+					imagePreview.style.display = 'block';
+					if (currentImage) currentImage.style.display = 'none';
+					imageTitle.textContent = 'PREVISUALIZACION';
+					submitButton.disabled = false;
+				};
+				reader.readAsDataURL(input.files[0]);
+			}
+		}
+
+		function copyPrompt() {
+			const promptTextElement = document.getElementById('prompt-text');
+			const textToCopy = promptTextElement.innerText.replace('PROMPT SUGERIDO: ', '');
+			navigator.clipboard.writeText(textToCopy).then(() => {
+				// Opcional: mostrar una notificación de que el texto se ha copiado.
+				alert("Prompt copiado al portapapeles");
+			});
+		}
+	</script>
+</body>
+
+</html>
